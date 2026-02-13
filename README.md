@@ -13,15 +13,15 @@ manifest:
   remotes:
     - name: zmkfirmware
       url-base: https://github.com/zmkfirmware
-    - name: eswai # ここを追加
-      url-base: https://github.com/eswai
+    - name: furugo-dev  # ここを追加
+      url-base: https://github.com/furugo-dev
   projects:
     - name: zmk
       remote: zmkfirmware
       revision: main
       import: app/west.yml
-    - name: zmk-naginata # ここを追加
-      remote: eswai
+    - name: zmk-naginata-v17       # ここを追加
+      remote: furugo-dev
       revision: main
   self:
     path: config
@@ -98,11 +98,11 @@ config/boards/your_keyboard/your_keyboard.keymapに薙刀式のコンボとレ�
 ## ローカルでbuildする場合の例
 
 ```
-git clone https://github.com/eswai/zmk-naginata.git
+git clone https://github.com/furugo-dev/zmk-naginata-v17.git
 cd zmk/app
 
 rm -rf build
-west build -b seeeduino_xiao_ble -- -DSHIELD=your_keyboard_left -DZMK_CONFIG="/Users/foo/zmk-config/config" -DZMK_EXTRA_MODULES="/Users/foo/zmk-naginata"
+west build -b seeeduino_xiao_ble -- -DSHIELD=your_keyboard_left -DZMK_CONFIG="/Users/foo/zmk-config/config" -DZMK_EXTRA_MODULES="/Users/foo/zmk-naginata-v17"
 cp build/zephyr/zmk.uf2 ~/zmk_left.uf2
 
 # 分割なら右手も
