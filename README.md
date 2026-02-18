@@ -1,9 +1,11 @@
-# ZMK 薙刀式
+# ZMK 薙刀式 v17 for ふるご
 
 ZMK Firmwareで薙刀式かな入力を実現します。
 薙刀式は大岡俊彦氏が考案されたかな入力方式です。
 
 http://oookaworks.seesaa.net/article/456099128.html
+
+このリポジトリは https://github.com/eswai/zmk-naginata をベースに個人用に作っているものです。
 
 ## Github Actionsでbuildする場合
 
