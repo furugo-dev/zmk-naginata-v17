@@ -113,6 +113,102 @@ west build -b seeeduino_xiao_ble -- -DSHIELD=your_keyboard_right -DZMK_CONFIG="/
 cp build/zephyr/zmk.uf2 ~/zmk_right.uf2
 ```
 
+## Home Row Modsとの両立
+
+Home Row Mods（HRM）とは、ホームポジションのキー（A、S、D、F、J、K、L、;）を長押しするとモディファイア（Shift、Ctrl、Alt、Guiなど）として機能させる設定方法です。
+
+### アーキテクチャ上の互換性
+
+ZMKのレイヤー設計により、**デフォルトレイヤーのHRMと薙刀式レイヤーの`&ng`は基本的に競合しません**。
+
+- デフォルトレイヤー（英字入力時）: `&mt MOD KEY` によるHRM
+- 薙刀式レイヤー（かな入力時）: `&ng KEY` によるかな入力
+
+薙刀式がオンのときはすべてのキーが`&ng`で処理されるため、HRMは自動的に無効になります。
+
+### HRM設定例
+
+デフォルトレイヤーにHRMを設定する例：
+
+```c
+default_layer {
+    bindings = <
+    // +----------+----------+----------+----------+----------+----------+----------+----------+----------+----------
+        &kp K      &kp D      &kp N      &kp F      &kp Q      &kp J      &kp BSPC   &kp R      &kp U      &kp P
+        &mt LCTRL W  &mt LALT I  &mt LGUI S  &mt LSHFT A  &kp G    &kp Y  &mt RSHFT E  &mt RGUI T  &mt RALT H  &mt RCTRL B
+        &kp Z      &kp X      &kp V      &kp C      &kp L      &kp M      &kp O      &kp COMMA  &kp DOT    &kp SLASH
+                              &kp LCMD   &mo LOWER  &mt LSHFT SPACE  &mt LSHFT ENTER  &mo RAISE  &kp RCTRL
+    >;
+};
+```
+
+### コンボとHRMのタイミング競合
+
+**注意**: 薙刀式をオンにするコンボ（例: H+J同時押し）に使うキーにHRMを設定すると、ZMKのhold-tapとコンボの解決タイミングが競合し、コンボが誤作動する場合があります。
+
+#### 解決策1: コンボキーにはHRMを設定しない
+
+薙刀式コンボに使うキー位置（デフォルト: H+J）にはHRMを設定しないようにします。
+
+```c
+default_layer {
+    bindings = <
+        ...
+        // H と J はコンボに使うためHRMなし
+        &mt LCTRL W  &mt LALT I  &mt LGUI S  &mt LSHFT A  &kp G    &kp Y  &mt RSHFT E  &mt RGUI T  &kp H  &kp J
+        ...
+    >;
+};
+```
+
+#### 解決策2: コンボに `require-prior-idle-ms` を設定する
+
+HRMを使うキー上のコンボは、キーが一定時間アイドル状態の後にのみ発火するよう設定できます。これによりタイピング中の誤作動を防ぎます。
+
+```c
+combos {
+    compatible = "zmk,combos";
+    combo_ng_on {
+        timeout-ms = <300>;
+        require-prior-idle-ms = <150>;  // HRMのhold-tap-tapping-term-msより大きい値に
+        key-positions = <15 16>;
+        bindings = <&ng_on>;
+        layers = <0>;
+    };
+};
+```
+
+#### 解決策3: 薙刀式の起動をコンボではなく専用キーにする
+
+サムキーやレイヤーキーなどHRMを使わないキーで薙刀式をオン/オフすると、コンボのタイミング問題を完全に回避できます。
+
+### 薙刀式モード中のモディファイアアクセス
+
+薙刀式レイヤー中は`&ng`がすべての文字キーを占有するため、従来のHRMモディファイアは使えません。
+
+#### 現在の設計での対処
+
+1. **サムキーのモディファイア**: 薙刀式レイヤーに`&kp LSHIFT`や`&kp RCTRL`がある場合、それらは通常のモディファイアとして機能します
+2. **編集モード**: JK同時押し、DF同時押し、CV同時押しなどの組み合わせでショートカット操作を行えます
+
+#### 薙刀式レイヤーにモディファイアを追加する
+
+薙刀式レイヤーの端のキー（Q、P、Z、Slash、Tab位置など）にモディファイアを追加できます：
+
+```c
+naginata_layer {
+    bindings = <
+    // +----------+----------+----------+----------+----------+----------+----------+----------+----------+----------
+        &ng Q      &ng W      &ng E      &ng R      &ng T      &ng Y      &ng U      &ng I      &ng O      &ng P
+        &kp LCTRL  &ng S      &ng D      &ng F      &ng G      &ng H      &ng J      &ng K      &ng L      &kp RCTRL
+        &kp LALT   &ng X      &ng C      &ng V      &ng B      &ng N      &ng M      &ng COMMA  &ng DOT    &kp RALT
+                              &kp LSHIFT &mo LOWER  &ng SPACE  &ng ENTER  &mo RAISE  &kp RCTRL
+    >;
+};
+```
+
+> **注**: 薙刀式で`A`（ろ）と`Z`（ほ）を使う場合、上記のように端のキーに移動する必要があります。使用するキーボードのレイアウトに応じて調整してください。
+
 ## 編集モードへの対応
 
 Macでは下の対応をすることによって編集モードで記号入力を行うことができます。
