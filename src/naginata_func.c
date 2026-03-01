@@ -753,8 +753,8 @@ void ng_redo() {
         raise_zmk_keycode_state_changed_from_encoded(LC(Y), false, timestamp);
         break;
     case NG_MACOS:
-        raise_zmk_keycode_state_changed_from_encoded(LS(LG((S))), true, timestamp);
-        raise_zmk_keycode_state_changed_from_encoded(LS(LG((S))), false, timestamp);
+        raise_zmk_keycode_state_changed_from_encoded(LG(LS(Z)), true, timestamp);
+        raise_zmk_keycode_state_changed_from_encoded(LG(LS(Z)), false, timestamp);
         break;
     }
 }
