@@ -19,7 +19,7 @@ ZMK Firmware向けの薙刀式v17かな入力モジュール。
 - `shift = NONE, douji = B_X` → Xの単独押し
 - `shift = B_SPACE, douji = B_X` → Space+Xの同時押し（親指シフト）
 - `shift = B_J, douji = B_X` → J+Xの同時押し（濁音など）
-- `shift = B_SPACE|B_U, douji = B_X` → Space+U+Xの3キー同時押し
+- `shift = NONE, douji = B_SPACE|B_U|B_X` → Space+U+Xの3キー同時押し
 
 ## 清音（単独押し）
 
