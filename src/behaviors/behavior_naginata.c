@@ -272,11 +272,11 @@ static naginata_kanamap ngdickana[] = {
     {.shift = NONE    , .douji = B_F|B_H|B_DOT  , .kana = {G, U, X, W, A, NONE            }, .func = nofunc }, // ぐゎ
     {.shift = NONE    , .douji = B_V|B_L|B_J    , .kana = {T, S, A, NONE, NONE, NONE      }, .func = nofunc }, // つぁ
     
-    // Shift+U = 濁音+ゅ modifier
-    {.shift = B_SPACE|B_U, .douji = B_W        , .kana = {G, Y, U, NONE, NONE, NONE            }, .func = nofunc }, // ぎゅ (き+Shift+U)
-    {.shift = B_SPACE|B_U, .douji = B_X        , .kana = {B, Y, U, NONE, NONE, NONE            }, .func = nofunc }, // びゅ (ひ+Shift+U)
-    {.shift = B_SPACE|B_U, .douji = B_G        , .kana = {D, Y, U, NONE, NONE, NONE            }, .func = nofunc }, // ぢゅ (ち+Shift+U)
-    {.shift = B_SPACE|B_U, .douji = B_E        , .kana = {D, H, U, NONE, NONE, NONE            }, .func = nofunc }, // でゅ (て+Shift+U)
+    // Space+U+〇 = 濁音+ゅ（3キー同時押し）
+    {.shift = NONE, .douji = B_SPACE|B_U|B_W   , .kana = {G, Y, U, NONE, NONE, NONE            }, .func = nofunc }, // ぎゅ
+    {.shift = NONE, .douji = B_SPACE|B_U|B_X   , .kana = {B, Y, U, NONE, NONE, NONE            }, .func = nofunc }, // びゅ
+    {.shift = NONE, .douji = B_SPACE|B_U|B_G   , .kana = {D, Y, U, NONE, NONE, NONE            }, .func = nofunc }, // ぢゅ
+    {.shift = NONE, .douji = B_SPACE|B_U|B_E   , .kana = {D, H, U, NONE, NONE, NONE            }, .func = nofunc }, // でゅ
 
     // 追加
     {.shift = NONE    , .douji = B_SPACE        , .kana = {SPACE, NONE, NONE, NONE, NONE, NONE  }, .func = nofunc },
