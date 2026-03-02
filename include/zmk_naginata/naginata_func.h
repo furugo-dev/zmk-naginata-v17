@@ -42,6 +42,7 @@ void ngh_DFM(void);
 void ngh_DFCOMM(void);
 void ngh_DFDOT(void);
 void ngh_DFSLSH(void);
+void ngh_DF_gyousen(void);
 void ngh_MCQ(void);
 void ngh_MCW(void);
 void ngh_MCE(void);
