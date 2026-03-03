@@ -253,15 +253,12 @@ void ngh_JKX() { // 』{改行}
     input_unicode_hex(N3, N0, N0, F);
 }
 
-void ngh_JKC() { // ！{改行}
-    raise_zmk_keycode_state_changed_from_encoded(LS(N1), true, timestamp);
-    raise_zmk_keycode_state_changed_from_encoded(LS(N1), false, timestamp);
-    raise_zmk_keycode_state_changed_from_encoded(ENTER, true, timestamp);
-    raise_zmk_keycode_state_changed_from_encoded(ENTER, false, timestamp);
+void ngh_JKC() { // undo
+    ng_undo();
 }
 
-void ngh_JKV() { // 」{改行}
-    input_unicode_hex(N3, N0, N0, D);
+void ngh_JKV() { // redo
+    ng_redo();
 }
 
 void ngh_JKB() { // ){改行}
