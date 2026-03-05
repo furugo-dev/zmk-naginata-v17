@@ -21,11 +21,13 @@ jobs:
           path: |
             zmk
             zmk-helpers
-            .west
           key: west-${{ hashFiles('config/west.yml') }}
 
       - name: West init
-        run: west init -l config/
+        run: |
+          if [ ! -d .west ]; then
+            west init -l config/
+          fi
 
       - name: West update
         run: west update
@@ -33,15 +35,21 @@ jobs:
       - name: West zephyr-export
         run: west zephyr-export
 
-      - name: Build naginata_test (nice_nano_v2)
+      - name: Build naginata_test (nice_nano/v2)
         run: |
-          west build -s zmk/app -d build -b nice_nano_v2 \
+          echo "--- environment ---"
+          echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
+          echo "pwd=$(pwd)"
+          ls -1
+          echo "--- west build ---"
+          west build -s zmk/app -d build -b nice_nano/v2 \
             -- \
             -DSHIELD=naginata_test \
             -DZMK_CONFIG="$GITHUB_WORKSPACE/config" \
             -DZMK_EXTRA_MODULES="$GITHUB_WORKSPACE"
 
       - name: Upload firmware artifact
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: naginata_test-nice_nano_v2
