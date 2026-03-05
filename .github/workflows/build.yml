@@ -10,3 +10,4 @@ jobs:
     uses: urob/zmk-actions/.github/workflows/run-tests.yml@v9.1.1
     with:
       zmk-version: main
+      verbose: true

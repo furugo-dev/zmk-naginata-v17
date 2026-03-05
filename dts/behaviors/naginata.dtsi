@@ -8,7 +8,6 @@
     behaviors {
         /omit-if-no-ref/ ng: naginata {
             compatible = "zmk,behavior-naginata";
-            label = "NAGINATA";
             #binding-cells = <1>;
         };
     };
