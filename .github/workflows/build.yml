@@ -1,5 +1,48 @@
-on: [push, pull_request, workflow_dispatch]
+name: Build ZMK Firmware
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
 
 jobs:
   build:
-    uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@main
+    runs-on: ubuntu-latest
+    container:
+      image: zmkfirmware/zmk-build-arm:3.5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cache west modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            zmk
+            zmk-helpers
+            .west
+          key: west-${{ hashFiles('config/west.yml') }}
+
+      - name: West init
+        run: west init -l config/
+
+      - name: West update
+        run: west update
+
+      - name: West zephyr-export
+        run: west zephyr-export
+
+      - name: Build naginata_test (nice_nano_v2)
+        run: |
+          west build -s zmk/app -d build -b nice_nano_v2 \
+            -- \
+            -DSHIELD=naginata_test \
+            -DZMK_CONFIG="$GITHUB_WORKSPACE/config" \
+            -DZMK_EXTRA_MODULES="$GITHUB_WORKSPACE"
+
+      - name: Upload firmware artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: naginata_test-nice_nano_v2
+          path: build/zephyr/zmk.uf2

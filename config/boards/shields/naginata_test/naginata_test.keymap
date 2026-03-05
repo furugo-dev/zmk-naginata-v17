@@ -1,0 +1,27 @@
+#include <behaviors.dtsi>
+#include <dt-bindings/zmk/keys.h>
+#include <behaviors/naginata.dtsi>
+
+/ {
+    keymap {
+        compatible = "zmk,keymap";
+
+        default_layer {
+            /* 薙刀式 31キーレイアウト
+             * Q    W    E    R    T      Y    U    I    O    P
+             * A    S    D    F    G      H    J    K    L    ;
+             * Z    X    C    V    B      N    M    ,    .    /
+             *                         [Space]
+             */
+            bindings = <
+                &ng Q    &ng W    &ng E    &ng R    &ng T
+                &ng Y    &ng U    &ng I    &ng O    &ng P
+                &ng A    &ng S    &ng D    &ng F    &ng G
+                &ng H    &ng J    &ng K    &ng L    &ng SEMI
+                &ng Z    &ng X    &ng C    &ng V    &ng B
+                &ng N    &ng M    &ng COMMA &ng DOT  &ng FSLH
+                &ng SPACE
+            >;
+        };
+    };
+};

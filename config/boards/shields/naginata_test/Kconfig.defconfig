@@ -1,0 +1,9 @@
+if SHIELD_NAGINATA_TEST
+
+config ZMK_KEYBOARD_NAME
+    default "Naginata Test"
+
+config NAGINATA
+    default y
+
+endif
