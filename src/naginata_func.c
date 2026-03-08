@@ -285,8 +285,8 @@ void ngh_DFP() { // カタカナ変換
     ng_katakana();
 }
 
-void ngh_DFH() { // ←
-    ng_left(1);
+void ngh_DFH() { // シフト左
+    ng_ST();
 }
 
 void ngh_DFJ() { // 確定エンド
@@ -299,8 +299,8 @@ void ngh_DFK() { // 再変換
     ng_saihenkan();
 }
 
-void ngh_DFL() { // →
-    ng_right(1);
+void ngh_DFL() { // シフト右
+    ng_SY();
 }
 
 void ngh_DFSCLN() { // デリート
@@ -308,8 +308,10 @@ void ngh_DFSCLN() { // デリート
     raise_zmk_keycode_state_changed_from_encoded(DELETE, false, timestamp);
 }
 
-void ngh_DFN() { // シフト左
-    ng_ST();
+void ngh_DFN() { // 7つシフト左
+    raise_zmk_keycode_state_changed_from_encoded(LSHIFT, true, timestamp);
+    ng_left(7);
+    raise_zmk_keycode_state_changed_from_encoded(LSHIFT, false, timestamp);
 }
 
 void ngh_DFM() { // 行頭へ移動
@@ -320,8 +322,10 @@ void ngh_DFCOMM() { // 行末へ移動
     ng_end();
 }
 
-void ngh_DFDOT() { // シフト右
-    ng_SY();
+void ngh_DFDOT() { // 7つシフト右
+    raise_zmk_keycode_state_changed_from_encoded(LSHIFT, true, timestamp);
+    ng_right(7);
+    raise_zmk_keycode_state_changed_from_encoded(LSHIFT, false, timestamp);
 }
 
 void ngh_DF_gyousen() { // 行選択
