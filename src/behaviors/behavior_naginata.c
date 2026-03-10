@@ -112,7 +112,7 @@ static naginata_kanamap ngdickana[] = {
     {.shift = NONE    , .douji = B_H            , .kana = {K, U, NONE, NONE, NONE, NONE   }, .func = nofunc }, // く
     {.shift = NONE    , .douji = B_S            , .kana = {K, E, NONE, NONE, NONE, NONE   }, .func = nofunc }, // け
     {.shift = NONE    , .douji = B_V            , .kana = {K, O, NONE, NONE, NONE, NONE   }, .func = nofunc }, // こ
-    {.shift = B_SPACE , .douji = B_U            , .kana = {Z, Y, U, NONE, NONE, NONE      }, .func = nofunc }, // じゅ
+    {.shift = B_SPACE , .douji = B_U            , .kana = {S, A, NONE, NONE, NONE, NONE   }, .func = nofunc }, // さ
     {.shift = NONE    , .douji = B_R            , .kana = {S, I, NONE, NONE, NONE, NONE   }, .func = nofunc }, // し
     {.shift = NONE    , .douji = B_O            , .kana = {S, U, NONE, NONE, NONE, NONE   }, .func = nofunc }, // す
     {.shift = B_SPACE , .douji = B_A            , .kana = {S, E, NONE, NONE, NONE, NONE   }, .func = nofunc }, // せ
@@ -272,12 +272,6 @@ static naginata_kanamap ngdickana[] = {
     {.shift = NONE    , .douji = B_F|B_H|B_DOT  , .kana = {G, U, X, W, A, NONE            }, .func = nofunc }, // ぐゎ
     {.shift = NONE    , .douji = B_V|B_L|B_J    , .kana = {T, S, A, NONE, NONE, NONE      }, .func = nofunc }, // つぁ
     
-    // Space+U+〇 = 濁音+ゅ（3キー同時押し）
-    {.shift = NONE, .douji = B_SPACE|B_U|B_W   , .kana = {G, Y, U, NONE, NONE, NONE            }, .func = nofunc }, // ぎゅ
-    {.shift = NONE, .douji = B_SPACE|B_U|B_X   , .kana = {B, Y, U, NONE, NONE, NONE            }, .func = nofunc }, // びゅ
-    {.shift = NONE, .douji = B_SPACE|B_U|B_G   , .kana = {D, Y, U, NONE, NONE, NONE            }, .func = nofunc }, // ぢゅ
-    {.shift = NONE, .douji = B_SPACE|B_U|B_E   , .kana = {D, H, U, NONE, NONE, NONE            }, .func = nofunc }, // でゅ
-
     // 追加
     {.shift = NONE    , .douji = B_SPACE        , .kana = {SPACE, NONE, NONE, NONE, NONE, NONE  }, .func = nofunc },
     {.shift = B_SPACE , .douji = B_V            , .kana = {COMMA, ENTER, NONE, NONE, NONE, NONE }, .func = nofunc },
