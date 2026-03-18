@@ -576,6 +576,39 @@ bool naginata_press(struct zmk_behavior_binding *binding, struct zmk_behavior_bi
             removeFromListArrayAt(&nginput, 0);
         }
         break;
+
+    // 矢印・移動キーのシフトパススルー
+    // Space/Enter保持中はShift付加、単独押しはそのまま通過
+    case LEFT:
+    case RIGHT:
+    case UP:
+    case DOWN:
+    case HOME:
+    case END:
+    case PG_UP:
+    case PG_DN: {
+        // nginputにSpace/Enter単独エントリがあれば消費してShiftを付加
+        int space_idx = -1;
+        for (int i = 0; i < nginput.size; i++) {
+            if (nginput.elements[i].size == 1 &&
+                (nginput.elements[i].elements[0] == SPACE ||
+                 nginput.elements[i].elements[0] == ENTER)) {
+                space_idx = i;
+                break;
+            }
+        }
+        if (space_idx >= 0) {
+            removeFromListArrayAt(&nginput, space_idx);
+            raise_zmk_keycode_state_changed_from_encoded(LSHIFT, true, timestamp);
+            raise_zmk_keycode_state_changed_from_encoded(keycode, true, timestamp);
+            raise_zmk_keycode_state_changed_from_encoded(keycode, false, timestamp);
+            raise_zmk_keycode_state_changed_from_encoded(LSHIFT, false, timestamp);
+        } else {
+            raise_zmk_keycode_state_changed_from_encoded(keycode, true, timestamp);
+            raise_zmk_keycode_state_changed_from_encoded(keycode, false, timestamp);
+        }
+        break;
+    }
     }
 
     LOG_DBG("<NAGINATA PRESS");
