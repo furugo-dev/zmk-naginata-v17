@@ -599,6 +599,8 @@ bool naginata_press(struct zmk_behavior_binding *binding, struct zmk_behavior_bi
         }
         if (space_idx >= 0) {
             removeFromListArrayAt(&nginput, space_idx);
+        }
+        if (pressed_keys & B_SPACE) {
             raise_zmk_keycode_state_changed_from_encoded(LSHIFT, true, timestamp);
             raise_zmk_keycode_state_changed_from_encoded(keycode, true, timestamp);
             raise_zmk_keycode_state_changed_from_encoded(keycode, false, timestamp);
