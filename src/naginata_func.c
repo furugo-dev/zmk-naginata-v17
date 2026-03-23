@@ -10,6 +10,8 @@
 #include <zmk_naginata/naginata_func.h>
 
 int64_t timestamp;
+uint32_t arrow_held_key = 0;
+bool arrow_held_shift = false;
 
 #define NG_WINDOWS (uint8_t)0
 #define NG_MACOS (uint8_t)1
@@ -159,17 +161,25 @@ void input_unicode_hex(int n1, int n2, int n3, int n4) {
     }
 }
 
-void ng_T() { ng_left(1); }
+void ng_T() {
+    if (arrow_held_key == LEFT) return;
+    ng_left(1);
+}
 
-void ng_Y() { ng_right(1); }
+void ng_Y() {
+    if (arrow_held_key == RIGHT) return;
+    ng_right(1);
+}
 
 void ng_ST() {
+    if (arrow_held_key == LEFT && arrow_held_shift) return;
     raise_zmk_keycode_state_changed_from_encoded(LSHIFT, true, timestamp);
     ng_left(1);
     raise_zmk_keycode_state_changed_from_encoded(LSHIFT, false, timestamp);
 }
 
 void ng_SY() {
+    if (arrow_held_key == RIGHT && arrow_held_shift) return;
     raise_zmk_keycode_state_changed_from_encoded(LSHIFT, true, timestamp);
     ng_right(1);
     raise_zmk_keycode_state_changed_from_encoded(LSHIFT, false, timestamp);

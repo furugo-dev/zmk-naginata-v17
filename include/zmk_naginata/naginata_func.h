@@ -1,4 +1,7 @@
 
+extern uint32_t arrow_held_key;
+extern bool arrow_held_shift;
+
 void naginata_on(void);
 // void naginata_off(void);
 void nofunc(void);
