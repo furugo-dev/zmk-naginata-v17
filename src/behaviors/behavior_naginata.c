@@ -508,6 +508,43 @@ bool naginata_press(struct zmk_behavior_binding *binding, struct zmk_behavior_bi
         n_pressed_keys++;
         pressed_keys |= ng_key[keycode - A]; // キーの重ね合わせ
 
+        // T/Y単独またはSpace+T/Y：矢印キーをeager pressしてオートリピート有効化
+        if (keycode == T && pressed_keys == B_T) {
+            if (arrow_held_key == 0) {
+                raise_zmk_keycode_state_changed_from_encoded(LEFT, true, timestamp);
+                arrow_held_key = LEFT;
+                arrow_held_shift = false;
+            }
+        } else if (keycode == Y && pressed_keys == B_Y) {
+            if (arrow_held_key == 0) {
+                raise_zmk_keycode_state_changed_from_encoded(RIGHT, true, timestamp);
+                arrow_held_key = RIGHT;
+                arrow_held_shift = false;
+            }
+        } else if (keycode == T && pressed_keys == (B_SPACE | B_T)) {
+            if (arrow_held_key == 0) {
+                raise_zmk_keycode_state_changed_from_encoded(LSHIFT, true, timestamp);
+                raise_zmk_keycode_state_changed_from_encoded(LEFT, true, timestamp);
+                arrow_held_key = LEFT;
+                arrow_held_shift = true;
+            }
+        } else if (keycode == Y && pressed_keys == (B_SPACE | B_Y)) {
+            if (arrow_held_key == 0) {
+                raise_zmk_keycode_state_changed_from_encoded(LSHIFT, true, timestamp);
+                raise_zmk_keycode_state_changed_from_encoded(RIGHT, true, timestamp);
+                arrow_held_key = RIGHT;
+                arrow_held_shift = true;
+            }
+        } else if (arrow_held_key != 0) {
+            // それ以外のキーが押された → 保持中の矢印をキャンセル
+            if (arrow_held_shift) {
+                raise_zmk_keycode_state_changed_from_encoded(LSHIFT, false, timestamp);
+            }
+            raise_zmk_keycode_state_changed_from_encoded(arrow_held_key, false, timestamp);
+            arrow_held_key = 0;
+            arrow_held_shift = false;
+        }
+
         if (keycode == SPACE || keycode == ENTER) {
             NGList a;
             initializeList(&a);
@@ -643,6 +680,15 @@ bool naginata_release(struct zmk_behavior_binding *binding,
             while (nginput.size > 0) {
                 ng_type(&(nginput.elements[0]));
                 removeFromListArrayAt(&nginput, 0);
+            }
+            // 保持中の矢印キーをリリース
+            if (arrow_held_key != 0) {
+                if (arrow_held_shift) {
+                    raise_zmk_keycode_state_changed_from_encoded(LSHIFT, false, timestamp);
+                }
+                raise_zmk_keycode_state_changed_from_encoded(arrow_held_key, false, timestamp);
+                arrow_held_key = 0;
+                arrow_held_shift = false;
             }
         } else {
             if (nginput.size > 0 && number_of_candidates(&(nginput.elements[0])) == 1) {
