@@ -9,6 +9,7 @@
 #include <zephyr/device.h>
 #include <drivers/behavior.h>
 #include <zephyr/logging/log.h>
+#include <zephyr/kernel.h>
 
 #include <zmk/event_manager.h>
 #include <zmk/events/keycode_state_changed.h>
@@ -20,6 +21,11 @@
 
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 extern int64_t timestamp;
+
+#define ARROW_REPEAT_DELAY_MS    300
+#define ARROW_REPEAT_INTERVAL_MS  40
+
+static struct k_work_delayable arrow_repeat_work;
 
 #define NONE 0
 
@@ -491,6 +497,20 @@ void ng_type(NGList *keys) {
     LOG_DBG("<NAGINATA NG_TYPE");
 }
 
+static void arrow_repeat_handler(struct k_work *work) {
+    if (arrow_held_key == 0) return;
+    int64_t ts = k_uptime_get();
+    if (arrow_held_shift) {
+        raise_zmk_keycode_state_changed_from_encoded(LSHIFT, true, ts);
+    }
+    raise_zmk_keycode_state_changed_from_encoded(arrow_held_key, true, ts);
+    raise_zmk_keycode_state_changed_from_encoded(arrow_held_key, false, ts);
+    if (arrow_held_shift) {
+        raise_zmk_keycode_state_changed_from_encoded(LSHIFT, false, ts);
+    }
+    k_work_reschedule(&arrow_repeat_work, K_MSEC(ARROW_REPEAT_INTERVAL_MS));
+}
+
 // 薙刀式の入力処理
 bool naginata_press(struct zmk_behavior_binding *binding, struct zmk_behavior_binding_event event) {
     LOG_DBG(">NAGINATA PRESS");
@@ -508,43 +528,49 @@ bool naginata_press(struct zmk_behavior_binding *binding, struct zmk_behavior_bi
         n_pressed_keys++;
         pressed_keys |= ng_key[keycode - A]; // キーの重ね合わせ
 
-        // T/Y単独またはSpace+T/Y：矢印キーをeager pressしてオートリピート有効化
+        // T/Y単独またはSpace+T/Y：矢印キーをeager press+releaseしてタイマーリピート開始
         if (keycode == T && pressed_keys == B_T) {
             if (arrow_held_key == 0) {
                 raise_zmk_keycode_state_changed_from_encoded(LEFT, true, timestamp);
+                raise_zmk_keycode_state_changed_from_encoded(LEFT, false, timestamp);
                 arrow_held_key = LEFT;
                 arrow_held_shift = false;
+                k_work_schedule(&arrow_repeat_work, K_MSEC(ARROW_REPEAT_DELAY_MS));
             }
         } else if (keycode == Y && pressed_keys == B_Y) {
             if (arrow_held_key == 0) {
                 raise_zmk_keycode_state_changed_from_encoded(RIGHT, true, timestamp);
+                raise_zmk_keycode_state_changed_from_encoded(RIGHT, false, timestamp);
                 arrow_held_key = RIGHT;
                 arrow_held_shift = false;
+                k_work_schedule(&arrow_repeat_work, K_MSEC(ARROW_REPEAT_DELAY_MS));
             }
         } else if (keycode == T && pressed_keys == (B_SPACE | B_T)) {
             if (arrow_held_key == 0) {
                 raise_zmk_keycode_state_changed_from_encoded(LSHIFT, true, timestamp);
                 raise_zmk_keycode_state_changed_from_encoded(LEFT, true, timestamp);
+                raise_zmk_keycode_state_changed_from_encoded(LEFT, false, timestamp);
+                raise_zmk_keycode_state_changed_from_encoded(LSHIFT, false, timestamp);
                 arrow_held_key = LEFT;
                 arrow_held_shift = true;
+                k_work_schedule(&arrow_repeat_work, K_MSEC(ARROW_REPEAT_DELAY_MS));
             }
         } else if (keycode == Y && pressed_keys == (B_SPACE | B_Y)) {
             if (arrow_held_key == 0) {
                 raise_zmk_keycode_state_changed_from_encoded(LSHIFT, true, timestamp);
                 raise_zmk_keycode_state_changed_from_encoded(RIGHT, true, timestamp);
+                raise_zmk_keycode_state_changed_from_encoded(RIGHT, false, timestamp);
+                raise_zmk_keycode_state_changed_from_encoded(LSHIFT, false, timestamp);
                 arrow_held_key = RIGHT;
                 arrow_held_shift = true;
+                k_work_schedule(&arrow_repeat_work, K_MSEC(ARROW_REPEAT_DELAY_MS));
             }
         } else if (arrow_held_key != 0) {
-            // それ以外のキーが押された → 保持中の矢印をキャンセル
-            if (arrow_held_shift) {
-                raise_zmk_keycode_state_changed_from_encoded(LSHIFT, false, timestamp);
-            }
-            raise_zmk_keycode_state_changed_from_encoded(arrow_held_key, false, timestamp);
+            // それ以外のキーが押された → タイマーをキャンセルして状態クリア
+            k_work_cancel_delayable(&arrow_repeat_work);
             arrow_held_key = 0;
             arrow_held_shift = false;
         }
-
         if (keycode == SPACE || keycode == ENTER) {
             NGList a;
             initializeList(&a);
@@ -637,7 +663,13 @@ bool naginata_press(struct zmk_behavior_binding *binding, struct zmk_behavior_bi
         if (space_idx >= 0) {
             removeFromListArrayAt(&nginput, space_idx);
         }
-        if (pressed_keys & B_SPACE) {
+        bool with_shift = (pressed_keys & B_SPACE) != 0;
+        if (arrow_held_key != 0) {
+            k_work_cancel_delayable(&arrow_repeat_work);
+            arrow_held_key = 0;
+            arrow_held_shift = false;
+        }
+        if (with_shift) {
             raise_zmk_keycode_state_changed_from_encoded(LSHIFT, true, timestamp);
             raise_zmk_keycode_state_changed_from_encoded(keycode, true, timestamp);
             raise_zmk_keycode_state_changed_from_encoded(keycode, false, timestamp);
@@ -645,6 +677,11 @@ bool naginata_press(struct zmk_behavior_binding *binding, struct zmk_behavior_bi
         } else {
             raise_zmk_keycode_state_changed_from_encoded(keycode, true, timestamp);
             raise_zmk_keycode_state_changed_from_encoded(keycode, false, timestamp);
+        }
+        if (keycode == LEFT || keycode == RIGHT || keycode == UP || keycode == DOWN) {
+            arrow_held_key = keycode;
+            arrow_held_shift = with_shift;
+            k_work_schedule(&arrow_repeat_work, K_MSEC(ARROW_REPEAT_DELAY_MS));
         }
         break;
     }
@@ -681,12 +718,9 @@ bool naginata_release(struct zmk_behavior_binding *binding,
                 ng_type(&(nginput.elements[0]));
                 removeFromListArrayAt(&nginput, 0);
             }
-            // 保持中の矢印キーをリリース
+            // タイマーリピートを停止
             if (arrow_held_key != 0) {
-                if (arrow_held_shift) {
-                    raise_zmk_keycode_state_changed_from_encoded(LSHIFT, false, timestamp);
-                }
-                raise_zmk_keycode_state_changed_from_encoded(arrow_held_key, false, timestamp);
+                k_work_cancel_delayable(&arrow_repeat_work);
                 arrow_held_key = 0;
                 arrow_held_shift = false;
             }
@@ -695,6 +729,20 @@ bool naginata_release(struct zmk_behavior_binding *binding,
                 ng_type(&(nginput.elements[0]));
                 removeFromListArrayAt(&nginput, 0);
             }
+        }
+        break;
+    case LEFT:
+    case RIGHT:
+    case UP:
+    case DOWN:
+    case HOME:
+    case END:
+    case PG_UP:
+    case PG_DN:
+        if (arrow_held_key != 0) {
+            k_work_cancel_delayable(&arrow_repeat_work);
+            arrow_held_key = 0;
+            arrow_held_shift = false;
         }
         break;
     }
@@ -713,6 +761,7 @@ static int behavior_naginata_init(const struct device *dev) {
     pressed_keys = 0UL;
     n_pressed_keys = 0;
     naginata_config.os =  NG_MACOS;
+    k_work_init_delayable(&arrow_repeat_work, arrow_repeat_handler);
 
     return 0;
 };
