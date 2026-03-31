@@ -358,6 +358,12 @@ static naginata_kanamap ngdickana[] = {
     {.shift = B_C|B_V    , .douji = B_DOT   , .kana = {NONE, NONE, NONE, NONE, NONE, NONE} , .func = ngh_CVDOT  }, // +{← 7}
     {.shift = B_C|B_V    , .douji = B_SLASH , .kana = {NONE, NONE, NONE, NONE, NONE, NONE} , .func = ngh_CVSLSH }, // +{→ 7}
 
+    // 定型文モード
+    {.shift = B_E|B_R, .douji = B_J, .kana = {NONE, NONE, NONE, NONE, NONE, NONE}, .func = ngh_PS_ER_J},
+    {.shift = B_E|B_R, .douji = B_N, .kana = {NONE, NONE, NONE, NONE, NONE, NONE}, .func = ngh_PS_ER_N},
+    {.shift = B_U|B_I, .douji = B_R, .kana = {NONE, NONE, NONE, NONE, NONE, NONE}, .func = ngh_PS_UI_R},
+    {.shift = B_U|B_I, .douji = B_F, .kana = {NONE, NONE, NONE, NONE, NONE, NONE}, .func = ngh_PS_UI_F},
+
 };
 
 // Helper function for counting matches/candidates
@@ -602,14 +608,15 @@ bool naginata_press(struct zmk_behavior_binding *binding, struct zmk_behavior_bi
         }
 
         // 連続シフト
-        static uint32_t rs[10][2] = {{D, F},     {C, V}, {J, K}, {M, COMMA}, {SPACE, 0},
-                                     {ENTER, 0}, {F, 0}, {V, 0}, {J, 0},     {M, 0}};
+        static uint32_t rs[12][2] = {{D, F},     {C, V}, {J, K}, {M, COMMA}, {SPACE, 0},
+                                     {ENTER, 0}, {F, 0}, {V, 0}, {J, 0},     {M, 0},
+                                     {E, R},     {U, I}};
 
         uint32_t keyset = 0UL;
         for (int i = 0; i < nginput.elements[0].size; i++) {
             keyset |= ng_key[nginput.elements[0].elements[i] - A];
         }
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 12; i++) {
             NGList rskc;
             initializeList(&rskc);
             addToList(&rskc, rs[i][0]);
