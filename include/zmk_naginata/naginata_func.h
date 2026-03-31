@@ -96,3 +96,7 @@ void ng_redo(void);
 void ng_undo(void);
 void ng_saihenkan(void);
 void ng_eof(void);
+void ngh_PS_ER_J(void);
+void ngh_PS_ER_N(void);
+void ngh_PS_UI_R(void);
+void ngh_PS_UI_F(void);

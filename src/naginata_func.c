@@ -848,3 +848,30 @@ void ng_eof() {
         break;
     }
 }
+
+static void type_phrase(const uint32_t *keys, int len) {
+    for (int i = 0; i < len; i++) {
+        raise_zmk_keycode_state_changed_from_encoded(keys[i], true, timestamp);
+        raise_zmk_keycode_state_changed_from_encoded(keys[i], false, timestamp);
+    }
+}
+
+void ngh_PS_ER_J(void) { // ありがとうございます。
+    static const uint32_t p[] = {A,R,I,G,A,T,O,U,G,O,Z,A,I,M,A,S,U,DOT};
+    type_phrase(p, sizeof(p)/sizeof(p[0]));
+}
+
+void ngh_PS_ER_N(void) { // お疲れ様です。
+    static const uint32_t p[] = {O,T,U,K,A,R,E,S,A,M,A,D,E,S,U,DOT};
+    type_phrase(p, sizeof(p)/sizeof(p[0]));
+}
+
+void ngh_PS_UI_R(void) { // 承知しました。
+    static const uint32_t p[] = {S,Y,O,U,T,I,S,I,M,A,S,I,T,A,DOT};
+    type_phrase(p, sizeof(p)/sizeof(p[0]));
+}
+
+void ngh_PS_UI_F(void) { // 確認いたします。
+    static const uint32_t p[] = {K,A,K,U,N,I,N,I,T,A,S,I,M,A,S,U,DOT};
+    type_phrase(p, sizeof(p)/sizeof(p[0]));
+}
