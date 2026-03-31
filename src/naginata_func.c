@@ -872,6 +872,6 @@ void ngh_PS_UI_R(void) { // 承知しました。
 }
 
 void ngh_PS_UI_F(void) { // 確認いたします。
-    static const uint32_t p[] = {K,A,K,U,N,I,N,I,T,A,S,I,M,A,S,U,DOT};
+    static const uint32_t p[] = {K,A,K,U,N,I,N,N,I,T,A,S,I,M,A,S,U,DOT};
     type_phrase(p, sizeof(p)/sizeof(p[0]));
 }
