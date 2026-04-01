@@ -18,9 +18,9 @@ bool arrow_held_shift = false;
 #define NG_LINUX (uint8_t)2
 #define NG_IOS (uint8_t)3
 
-typedef union {
+typedef struct {
     uint8_t os : 2;
-    bool tategaki : true;
+    bool tategaki : 1;
 } user_config_t;
 
 user_config_t naginata_config;
@@ -851,6 +851,9 @@ void ng_eof() {
 
 static void type_phrase(const uint32_t *keys, int len) {
     for (int i = 0; i < len; i++) {
+        if (i > 0 && keys[i] == keys[i-1]) {
+            k_sleep(K_MSEC(10));
+        }
         raise_zmk_keycode_state_changed_from_encoded(keys[i], true, timestamp);
         raise_zmk_keycode_state_changed_from_encoded(keys[i], false, timestamp);
     }
