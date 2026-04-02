@@ -750,8 +750,8 @@ void ng_katakana() {
         raise_zmk_keycode_state_changed_from_encoded(LC(I), false, timestamp);
         break;
     case NG_MACOS:
-        raise_zmk_keycode_state_changed_from_encoded(LC(K), true, timestamp);
-        raise_zmk_keycode_state_changed_from_encoded(LC(K), false, timestamp);
+        raise_zmk_keycode_state_changed_from_encoded(LC(I), true, timestamp);
+        raise_zmk_keycode_state_changed_from_encoded(LC(I), false, timestamp);
         break;
     case NG_IOS: return;
     }
@@ -776,12 +776,9 @@ void ng_hiragana() {
     switch (naginata_config.os) {
     case NG_WINDOWS:
     case NG_LINUX:
+    case NG_MACOS:
         raise_zmk_keycode_state_changed_from_encoded(LC(U), true, timestamp);
         raise_zmk_keycode_state_changed_from_encoded(LC(U), false, timestamp);
-        break;
-    case NG_MACOS:
-        raise_zmk_keycode_state_changed_from_encoded(LC(J), true, timestamp);
-        raise_zmk_keycode_state_changed_from_encoded(LC(J), false, timestamp);
         break;
     case NG_IOS: return;
     }
