@@ -275,6 +275,7 @@ cp build/zephyr/zmk.uf2 ~/zmk_right.uf2
 | `F15` | Windows モード |
 | `F16` | macOS モード（デフォルト） |
 | `F17` | Linux モード |
+| `F20` | iOS モード |
 | `F18` | 縦書きモード ※ |
 | `F19` | 横書きモード ※ |
 
